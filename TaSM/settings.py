@@ -12,13 +12,19 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-TEMPLETE_DIRS = (
-    '/home/harannath/projects/TaSM/templates',
-)
+# TEMPLETE_DIRS = (
+#     '/home/harannath/projects/TaSM/templates',
+# )
 
 STATICFILES_DIRS = (
     '/home/harannath/projects/TaSM/static',
 )
+TEMPLATE_DIRS = (
+    os.path.join(BASE_DIR, 'templates'),
+)
+
+LOGIN_REDIRECT_URL = '/home'
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
@@ -31,6 +37,8 @@ DEBUG = True
 
 TEMPLATE_DEBUG = True
 
+SITE_ID=1
+ACCOUNT_ACTIVATION_DAYS=7
 ALLOWED_HOSTS = []
 
 
@@ -44,6 +52,10 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'TaSM_site',
+    'django.contrib.sites',
+    'registration',
+
+
 )
 
 MIDDLEWARE_CLASSES = (

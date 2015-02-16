@@ -18,6 +18,8 @@
 
 
 import csv
+from TaSM_site.models import Product
+obj=Product()
 reader=csv.reader(open("arts.csv","r"))
 header=reader.next()
 product_dict={}
@@ -36,11 +38,12 @@ for item in list2:
 for item in set_productid:
 	product_dict[item]={}
 for item in list2:
-	product_dict[item['productId']].update({item['productTitle'] : item['price']})
+	product_dict[item['productId']].update({'productTitle':item['productTitle'],'price': item['price']})
 for item in product_dict:
 	pid=item#product_dict[item]['productId']
 	title=product_dict[item]['productTitle']
 	price=product_dict[item]['price']
+	print title
 	if len(title)>200:
 		title=title[:199]
 	if price=='unknown':

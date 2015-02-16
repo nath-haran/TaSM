@@ -1,0 +1,7 @@
+{% load i18n %}
+
+{% block content %}
+{% for product,count in recommendations %}
+	{{product}} <a href={%url 'product'%}>buy</a><br>	
+{% endfor %}
+{% endblock %}

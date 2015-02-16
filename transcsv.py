@@ -32,7 +32,7 @@ for row in reader:
 header2=['userId','productId','rating','time']
 list2=[]
 for item in list1:
-	if item['review/userId']!='unknown':
+	if item['review/userId']!='unknown' and item['review/userId']!='':
 		if item['review/time']=='unknown' or item['review/time']=='':
 			date_time=datetime.datetime.now()
 		else:
@@ -51,9 +51,9 @@ for item in list1:
 for item in list2:
 	obj=None
 	obj=Transaction.objects.filter(productid=item['productId'],userid=item['userId'])
-	if obj==None:
+	if len(obj)==0:
 		obj=Transaction();
-		obj.validate_unique();
+		#obj.validate_unique();
 		obj.userid=item['userId']
 		obj.productid=item['productId']
 		obj.rating=int(float(item['rating']))

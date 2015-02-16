@@ -1,0 +1,7 @@
+{% load i18n %}
+
+{% block content %}
+{% for product,count in recommendations %}
+	{{product}} <br>	
+{% endfor %}
+{% endblock %}

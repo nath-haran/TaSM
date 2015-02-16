@@ -36,7 +36,7 @@ for item in set_userid:
 for item in list2:
 	user_dict[item['userId']].update({'name':item['username']})
 
-obj=User.objects.create();
+obj=User()
 obj.validate_unique();
 
 
@@ -50,4 +50,5 @@ for item in user_dict:
 	# 	price=0.0
  	obj.userid=uid;
 	obj.username=name;
+	obj.email=uid+"@gmail.com"
 	obj.save();
