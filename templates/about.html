@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+{% block body %}
+<div class="hero-unit">
+    <h1>About Authors</h1>
+    The Authors of this site are <strong>
+	<li>Haran:9488983476</li>
+	<li>Jegan:9976097015</li>
+	<li>Kailash:8148994384</li>	</strong> <br />
+
+    You've visited the site on <strong>{{ visit_count }} occasion(s)</strong>.<br />
+
+    Here's the picture of Authors!<br />
+    <!-- <img src="{% static 'haran.jpg' %}" alt="Picture of Haran" />
+    <img src="{% static 'jegan.jpg' %}" alt="Picture of Jegan" />
+    <img src="{% static 'kai.jpg' %}" alt="Picture of Kailash" /> -->
+</div>
+{% endblock %}

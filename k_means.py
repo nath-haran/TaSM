@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import simplejson
 from math import sqrt
+import itertools
 reader=csv.reader(open("arts.csv","r"))
 header=reader.next()
 rating_dict_product={}
@@ -21,19 +22,19 @@ def distance(item1,item2):
 	sum_y2=0
 	x=0
 	y=0
-	n=0
-	for i in range(len(set_userid)):
-		x=0
-		y=0
-		x=float(item1[i])
-		if item2.has_key(list(set_userid)[i]) and item2[list(set_userid)[i]]!='':
-				y=float(item2[list(set_userid)[i]])
-		n=n+1
-		sum_xy += x * y
-		sum_x += x
-		sum_y += y
-		sum_x2 += x**2
-		sum_y2 += y**2
+	n=1
+	for i in item2:
+		if item2[i]!='':
+			x=0
+			y=0
+			x=float(item1[list(set_userid).index(i)])
+			y=float(item2[i])
+			n=n+1
+			sum_xy += x * y
+			sum_x += x
+			sum_y += y
+			sum_x2 += x**2
+			sum_y2 += y**2
 	denominator = sqrt(sum_x2 - (sum_x**2) / n) *sqrt(sum_y2 -(sum_y**2) / n)
 	if denominator == 0:
 		return 0
@@ -124,6 +125,8 @@ for j in range(k):
 		val3=random.random()*val2
 		clusters[j].append(val3)
 z=0
+list_userid=list(set_userid)
+list_productid=list(set_productid)
 for t in range(5):
 	print t
 	bestmatches=[[] for i in range(k)]
@@ -131,7 +134,7 @@ for t in range(5):
 		bestmatch=0
 		for i in range(k):
 			d=distance(clusters[i],rating_dict_product[row])
-			if d< distance(clusters[bestmatch],rating_dict_product[row]): bestmatch=i
+			if d > distance(clusters[bestmatch],rating_dict_product[row]): bestmatch=i
 			#print "bestmatches"
 		bestmatches[bestmatch].append(row)
 		print "skdjfh"+str(z)
@@ -139,6 +142,22 @@ for t in range(5):
 	if bestmatches==lastmatches:
 		break
 	lastmatches=bestmatches
+	for i in range(k):
+	 avgs=[0.0]*len(set_userid)
+	 if len(bestmatches[i])>0:
+	 	m=0
+	 	for productid in bestmatches[i]:
+	 		m=0
+	 		for userid in rating_dict_product[productid]:
+	 		 m=list_userid.index(userid)
+	 		 if rating_dict_product[productid][userid]!='':
+			 	avgs[m]+=float(rating_dict_product[productid][userid])
+	 	for j in range(len(avgs)):
+	 		avgs[j]/=len(bestmatches[i])
+	 	clusters[i]=avgs
+writer=csv.writer(open("products_cluster.csv","wb"),quoting=csv.QUOTE_ALL)
+for val in itertools.izip_longest(bestmatches[0],bestmatches[1],bestmatches[2],bestmatches[3],bestmatches[4],fillvalue=' '):
+	writer.writerow(val)
 	
 
 	#rating_dict_product[item['userId']][item['productId']]=item['rating']
@@ -148,4 +167,4 @@ for t in range(5):
 # 		distance=0
 # 		distance=pearson(cur_user,user)
 # 		distance_list.append({'name': user,'distance':distance})
-# sorted_distance_list=sorted(distance_list,key= lambda k : k['distance'],reverse=True)
+# sorted_distance_list=sorted(distance_list,key= lambda k : k['distance'],reverse=True)	

@@ -116,7 +116,7 @@ for t in range(5):
 		bestmatch=0
 		for i in range(k):
 			d=distance(clusters[i],rating_dict_user[user])
-			if d<distance(clusters[bestmatch],rating_dict_user[user]): bestmatch=i
+			if d>distance(clusters[bestmatch],rating_dict_user[user]): bestmatch=i
 #			print d
 		bestmatches[bestmatch].append(user)
 		#print "skdjfh"+str(z)

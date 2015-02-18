@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import RequestContext, loader,Context
 from TaSM_site.models import User
+from TaSM_site.models import Product
 from TaSM_site.models import Transaction
 # Create your views here.
 from django.shortcuts import render_to_response
@@ -9,7 +10,7 @@ from math import sqrt
 import csv
 from django.db import connection
 import numpy as np
-
+from package_apriori import apriorimain
 
 #pearson
 
@@ -36,8 +37,8 @@ def calculate_similarity(item1,item2,rating_dict_product,avg_rating):
 			#print avg
 			#print rating_dict_product[item2][key1]
 			#print rating_dict_product[item1][key1]
-			#print num1
-			#print num2
+			print num1
+			print num2
 			###
 			num+=(num1)*(num2)
 			#print num
@@ -91,6 +92,7 @@ def pearson(user1,user2):
 
 #pearson
 def home(request):
+
 	user=request.user
 	template1=loader.get_template('home.html')
 	id=user.email
@@ -138,6 +140,10 @@ def home(request):
 			distance=pearson(cur_user,user)
 			distance_list.append({'name': user,'distance':distance})
 	sorted_distance_list=sorted(distance_list,key= lambda k : k['distance'],reverse=True)
+	products=Product.objects.all().values()
+	product_name={}
+	for item in products:
+		product_name.update({item['productid']:item['product_name']})
 	recommendations=set([])
 	i=0
 	for item in distance_list:
@@ -145,11 +151,12 @@ def home(request):
 		if i<100:
 			for product in rating_dict[item['name']]:
 				if not product in user_dict:
-					recommendations.add((product,product_count[product]))
+					recommendations.add((product,product_name[product] ,product_count[product]))
 		else:
 			break
 		i+=1
-	recommendations=sorted(recommendations,key=lambda x : x[1],reverse=True)[:10]
+	recommendations=sorted(recommendations,key=lambda x : x[2],reverse=True)[:10]
+	print recommendations
 	return render_to_response('home.html', {'recommendations':recommendations}, context_instance=RequestContext(request))
 	# return HttpResponse(template1.render(c))
 
@@ -243,14 +250,94 @@ def product(request,id):
 			print j
 		j+=1
 
-	
-	recommendations=set([])
+	related_dict=sorted(related_dict,key=lambda x:  x[1],reverse=True)
+	recommendations_1=set([])
 	for item in related_dict:
-		if len(recommendations)<100:
-			recommendations.add((item[0],product_count[item[0]]))
+		if len(recommendations_1)<100:
+			recommendations_1.add((item[0],product_count[item[0]]))
 
-	recommendations=sorted(recommendations,key=lambda x : x[1],reverse=True)[:10]
-	return render_to_response('product.html', {'recommendations':recommendations}, context_instance=RequestContext(request))
+	
+	sum=0
+	for item in recommendations_1:
+		sum+=item[1]
+	print sum
+	##apriori##	
+	reader=csv.reader(open('trans4.csv','rb'))
+	clus=[]
+	k=0
+	for i in range(129):
+	    clus.append([])
+	for row in reader:
+	    for i in range(len(row)):
+	        if row[i]!='NULL':
+	            clus[k].append(row[i])
+	    k+=1
+	#print clus
+
+	import pprint
+	def load_dataset():
+	    return clus
+	dataset = load_dataset()
+	D = map(set, dataset)
+	#pprint.pprint(dataset)
+
+	C1 = apriorimain.create_candidates(dataset, verbose=True) 
+
+	F1, support_data = apriorimain.support_prune(D, C1, 0.05, verbose=True)
+
+	F, support_data = apriorimain.apriori(dataset, min_support=0.05, verbose=True)
+
+	H = apriorimain.generate_rules(F, support_data, min_confidence=0.5, verbose=True)
+	recommendations_2=[]
+	for item in H:
+	   if len(item[0])==1:
+	       if list(item[0])[0]==id:
+	       		for rule in item[1]:
+	           		recommendations_2.append((rule,item[2]))
+	recommendations_final=[]
+	for item in recommendations_1:
+		recommendations_final.append((item[0],float(float(item[1])/sum)))
+	for item in recommendations_2:
+		recommendations_final.append((item[0],item[1]))
+	recommendations_final=sorted(recommendations_final,key=lambda x : x[1],reverse=True)
+
+	##apriori##	
+	products=Product.objects.all().values()
+	product_name={}
+	for item in products:
+		product_name.update({item['productid']:item['product_name']})
+	recommendation_dict={}
+	for item in recommendations_final:
+		recommendation_dict.update({item[0]:product_name[item[0]]})
+	for item in recommendation_dict:
+		print recommendation_dict[item]
+	
+	# for item in  recommendations_final:
+	# 	print item
+	return render_to_response('product.html', {'recommendations':recommendation_dict}, context_instance=RequestContext(request))
+
+def home_page(request):
+	return render_to_response('base.html', {})
+
+def user_list(request):
+	users =list(User.objects.all().values())
+	# user=set([])
+	# for item in users_list:
+	# 	user.append((item[0],item[1]))
+	return render_to_response('user.html', {'users': users},context_instance=RequestContext(request))
+	
+def product_list(request):
+	# user=request.user
+	# template1=loader.get_template('home.html')
+	# id=user.email
+	product = list(Product.objects.all().values())
+	return render_to_response('product_list.html', {'products': product},context_instance=RequestContext(request))
+
+def about_page(request):
+	# user=request.user
+	# template1=loader.get_template('home.html')
+	# id=user.email
+	return render_to_response('about.html', {},context_instance=RequestContext(request))
 
 
 	# count=0

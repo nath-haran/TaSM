@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Products in our site{% endblock %}
+{% block body %}
+<table class="table table-hover">
+<th>Product Id</th>
+<th>Product Name</th>
+{% for item in products %}
+{%if item.productid != "" %}
+<tr>
+<td><a href="/products/{{item.productid}}">{{ item.productid }}</a></td>
+<td>{{ item.product_name }}</td>
+</tr>
+{%endif%}
+{%endfor%}</table>
+{% endblock %}
