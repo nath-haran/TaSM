@@ -77,7 +77,7 @@ for row in reader:
 header2=['userId','productId','rating']
 list2=[]
 for item in list1:
-	if item['review/userId']!='unknown':
+	if item['review/userId']!='unknown' and item['review/userId']!='':
 		list2.append(dict(zip(header2,[item['review/userId'],item['product/productId'],item['review/score']])))
 #for item in list2:
 #	print list2
