@@ -3,10 +3,12 @@ from django.contrib import admin
 from TaSM_site.forms import RegistrationForm
 from TaSM_site.views import user_list,product_list,about_page,home_page
 from registration.backends.default.views import RegistrationView
+from django.views.generic import RedirectView
+from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
 #from TaSM_site import views
 
 urlpatterns = patterns('',
-    # Examples:
+    # Examples:rl
     # url(r'^$', 'TaSM.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
 
@@ -16,11 +18,13 @@ urlpatterns = patterns('',
      # url(r'accounts/register/$', 
      #     RegistrationView.as_view(form_class = RegistrationForm), 
      #     name = 'registration_register'),
- 
-    url(r'^accounts/', include('registration.backends.default.urls')),
+    url(r'^accounts/register/complete/$', RedirectView.as_view(url= '/accounts/login/'),name='registration-successful-redirect'),
+    
+    url(r'^accounts/', include('registration.backends.simple.urls')),
     (r'^$', home_page),
     (r'^user/$', user_list),
     (r'^product_list/$', product_list),
     (r'^about/$', about_page),
+     
 
 )

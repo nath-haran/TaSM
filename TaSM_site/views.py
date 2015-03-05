@@ -317,7 +317,22 @@ def product(request,id):
 	return render_to_response('product.html', {'recommendations':recommendation_dict}, context_instance=RequestContext(request))
 
 def home_page(request):
-	return render_to_response('base.html', {})
+	transaction=Transaction.objects.all().values()
+	rating_count={}
+	for item in transaction:
+		rating_count.update({item['productid']:[0,0,0,0,0]})
+	for item in transaction:
+		rating_count[item['productid']][int(item['rating']-1)]+=1
+	sorted_rating=sorted(rating_count.items(),key=lambda x : x[1][4],reverse=True)[:20]
+	print sorted_rating
+	products=Product.objects.all().values()
+	product_name={}
+	for item in products:
+		product_name.update({item['productid']:item['product_name']})
+	product_list=[]
+	for item in sorted_rating:
+		product_list.append((item[0],product_name[item[0]],item[1]))
+	return render_to_response('base.html', {'products':product_list	})
 
 def user_list(request):
 	users =list(User.objects.all().values())

@@ -60,28 +60,7 @@
         </div>
         <!--/span-->
         <div class="span9">
-            {% block body %}
-            <table class="table table-hover">
-            <th>Product Name</th>
-            <th>1</th>
-            <th>2</th>
-            <th>3</th>
-            <th>4</th>
-            <th>5</th>
-
-            {% for item0,item1,item2 in products %}
-            <tr>
-            <td><a href="/products/{{item0}}">{{ item1 }}</a></td>
-            {% for item3 in item2 %}
-              <td>{{ item3 }}</td>
-              {%endfor%}
-            </tr>
-            {%endfor%}
-          </table>
-
-
-
-            {% endblock %}
+            {% block body %}{% endblock %}
 
         </div>
         <!--/span-->
