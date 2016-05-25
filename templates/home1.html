@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+
+{% block body %}
+<table class="table table-hover">
+<th>Product Id</th>
+<th>Product Name</th>
+{% for product,name,count in recommendations %}
+<tr>
+<td><a href="/products/{{product}}">{{ product }}</a></td>
+<td>{{ name }}</td>
+</tr>
+{%endfor%}</table>
+{% endblock %}

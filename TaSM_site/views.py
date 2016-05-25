@@ -37,8 +37,8 @@ def calculate_similarity(item1,item2,rating_dict_product,avg_rating):
 			#print avg
 			#print rating_dict_product[item2][key1]
 			#print rating_dict_product[item1][key1]
-			print num1
-			print num2
+			#print num1
+			#print num2
 			###
 			num+=(num1)*(num2)
 			#print num
@@ -91,10 +91,10 @@ def pearson(user1,user2):
 
 
 #pearson
-def home(request):
+def home1(request):
 
 	user=request.user
-	template1=loader.get_template('home.html')
+	template1=loader.get_template('home1.html')
 	id=user.email
 	cur_user=User.objects.filter(email=id).values()[0]['userid']
 	#c=Context({"id":cur_user['email'],"username":cur_user['userid']})
@@ -156,8 +156,10 @@ def home(request):
 			break
 		i+=1
 	recommendations=sorted(recommendations,key=lambda x : x[2],reverse=True)[:10]
-	print recommendations
-	return render_to_response('home.html', {'recommendations':recommendations}, context_instance=RequestContext(request))
+	for item in recommendations:
+		print item[0]+'\t'+item[1]
+	#print recommendations
+	return render_to_response('home1.html', {'recommendations':recommendations}, context_instance=RequestContext(request))
 	# return HttpResponse(template1.render(c))
 
 def product(request,id):
@@ -247,7 +249,7 @@ def product(request,id):
 		
 		if item1!=id:
 			related_dict.append((item1,distance_matrix[j]))
-			print j
+			#print j
 		j+=1
 
 	related_dict=sorted(related_dict,key=lambda x:  x[1],reverse=True)
@@ -256,11 +258,17 @@ def product(request,id):
 		if len(recommendations_1)<100:
 			recommendations_1.add((item[0],product_count[item[0]]))
 
-	
+	products=Product.objects.all().values()
+	product_name={}
+	for item in products:
+		product_name.update({item['productid']:item['product_name']})
+	# for item in recommendations_1:
+	# 	print item[0]+'\t'+str(product_name[item[0]])
 	sum=0
+	
 	for item in recommendations_1:
 		sum+=item[1]
-	print sum
+	#print sum
 	##apriori##	
 	reader=csv.reader(open('trans4.csv','rb'))
 	clus=[]
@@ -294,6 +302,8 @@ def product(request,id):
 	       if list(item[0])[0]==id:
 	       		for rule in item[1]:
 	           		recommendations_2.append((rule,item[2]))
+	for item in recommendations_2:
+		print item[0]+'\t'+product_name[item[0]]
 	recommendations_final=[]
 	for item in recommendations_1:
 		recommendations_final.append((item[0],float(float(item[1])/sum)))
@@ -310,7 +320,9 @@ def product(request,id):
 	for item in recommendations_final:
 		recommendation_dict.update({item[0]:product_name[item[0]]})
 	for item in recommendation_dict:
-		print recommendation_dict[item]
+		print item+'\t'+recommendation_dict[item]
+	#for item in recommendation_dict:
+	#	print recommendation_dict[item]
 	
 	# for item in  recommendations_final:
 	# 	print item
@@ -324,7 +336,7 @@ def home_page(request):
 	for item in transaction:
 		rating_count[item['productid']][int(item['rating']-1)]+=1
 	sorted_rating=sorted(rating_count.items(),key=lambda x : x[1][4],reverse=True)[:20]
-	print sorted_rating
+	#print sorted_rating
 	products=Product.objects.all().values()
 	product_name={}
 	for item in products:
@@ -333,6 +345,23 @@ def home_page(request):
 	for item in sorted_rating:
 		product_list.append((item[0],product_name[item[0]],item[1]))
 	return render_to_response('base.html', {'products':product_list	})
+def top_rated(request):
+	transaction=Transaction.objects.all().values()
+	rating_count={}
+	for item in transaction:
+		rating_count.update({item['productid']:[0,0,0,0,0]})
+	for item in transaction:
+		rating_count[item['productid']][int(item['rating']-1)]+=1
+	sorted_rating=sorted(rating_count.items(),key=lambda x : x[1][4],reverse=True)[:20]
+	#print sorted_rating
+	products=Product.objects.all().values()
+	product_name={}
+	for item in products:
+		product_name.update({item['productid']:item['product_name']})
+	product_list=[]
+	for item in sorted_rating:
+		product_list.append((item[0],product_name[item[0]],item[1]))
+	return render_to_response('toprated.html', {'products':product_list	})
 
 def user_list(request):
 	users =list(User.objects.all().values())
@@ -347,6 +376,14 @@ def product_list(request):
 	# id=user.email
 	product = list(Product.objects.all().values())
 	return render_to_response('product_list.html', {'products': product},context_instance=RequestContext(request))
+
+
+def home(request):
+	# user=request.user
+	# template1=loader.get_template('home.html')
+	# id=user.email
+	return render_to_response('home.html', {},context_instance=RequestContext(request))
+
 
 def about_page(request):
 	# user=request.user

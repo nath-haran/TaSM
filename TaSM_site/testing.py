@@ -87,49 +87,46 @@ for user in rating_dict_users:
 i=0
 j=0
 length=len(set_productid)
-distance_matrix=np.ndarray(shape=(length,length),dtype=float,order='F')
-for item1 in set_productid:
-	j=0
-	for item2 in set_productid:
-		similarity=0
-		if item1!=item2:
-			#similarity=float(0)
-			similarity=calculate_similarity(item1,item2)
-		distance_matrix[i][j]=similarity
-		#if distance_matrix[i][j]!=0.0:
-		#	print distance_matrix[i][j]
-		j+=1
-	i+=1
-i=0
-j=0
 
-#for item1 in set_productid:
-#	j=0
-#	print item1+":"
-#	for item2 in set_productid:
-#		if distance_matrix[i][j]>0.0:
-#			print item2
-		#print item1+":"+item2+":"+str(distance_matrix[i][j])
-#		j+=1
-#	i+=1	
-# related_dict={}
-# for item in set_productid:
-# 	related_dict[item]=[]
+reader=csv.reader(open('products_cluster.csv','rb'))
+cur_prod='B000MARKT2'
+clusters=[]
+for i in range(5):
+	clusters.append([])
+for row in reader:
+	for i in range(len(row)):
+		if row[i]!='' and row[i]!=' ':
+			clusters[i].append(row[i])
+distance_list=[]
+for i in range(5):
+	distance_list.append([])
+i=0
+for cluster in clusters:
+	for product in cluster:
+		similarity=0
+		similarity=calculate_similarity(cur_prod,product)
+		distance_list[i].append(similarity)
+	i=i+1
+count_test=[]
+for distance in distance_list:
+	countp=0
+	countn=0
+	for item in distance:
+		if item>0:
+			countp+=1
+		if item<0:
+			countn+=1
+	count_test.append((countp,countn))
 # for item1 in set_productid:
 # 	j=0
 # 	for item2 in set_productid:
+# 		similarity=0
 # 		if item1!=item2:
-# 			if distance_matrix[i][j]>0.0:
-# 				#print "entered"
-# 				related_dict[item1].append(item2)
+# 			#similarity=float(0)
+# 			similarity=calculate_similarity(item1,item2)
+# 		distance_matrix[i][j]=similarity
+# 		#if distance_matrix[i][j]!=0.0:
+# 		#	print distance_matrix[i][j]
 # 		j+=1
 # 	i+=1
-# #f=open('related-items.csv')
-# #writer=csv.DictWriter(f,'w')
-# for row in related_dict:
-# 	print str(row)+":",
-# 	for item in related_dict[row]:
-# 		print item,
-# 	print ''
-#f.close()
 
